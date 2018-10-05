@@ -502,6 +502,13 @@ class QgsFmvPlayer(QMainWindow, Ui_PlayerWindow):
 
         self.videoWidget.UpdateSurface()
 
+    def VideoCensure(self, value):
+        ''' Censure Video Parts'''
+        self.UncheckUtils(self.sender(), value)
+        self.videoWidget.SetCensure(value)
+        self.videoWidget.UpdateSurface()
+        return
+
     def UncheckUtils(self, sender, value):
         ''' Uncheck Utils Video '''
         self.actionMagnifying_glass.setChecked(False)
@@ -510,6 +517,7 @@ class QgsFmvPlayer(QMainWindow, Ui_PlayerWindow):
         self.actionDraw_Polygon.setChecked(False)
         self.actionObject_Tracking.setChecked(False)
         self.actionRuler.setChecked(False)
+        self.actionCensure.setChecked(False)
 
         self.videoWidget.RestoreDrawer()
 

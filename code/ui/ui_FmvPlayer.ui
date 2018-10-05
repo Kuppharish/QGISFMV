@@ -687,6 +687,8 @@ QProgressBar::chunk
    <addaction name="actionRuler"/>
    <addaction name="separator"/>
    <addaction name="actionObject_Tracking"/>
+   <addaction name="separator"/>
+   <addaction name="actionCensure"/>
   </widget>
   <action name="actionGray">
    <property name="checkable">
@@ -949,6 +951,21 @@ QProgressBar::chunk
    </property>
    <property name="text">
     <string>Horizontal Mirrored</string>
+   </property>
+  </action>
+  <action name="actionCensure">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/imgFMV/images/censure-pencil.png</normaloff>:/imgFMV/images/censure-pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>Censure</string>
+   </property>
+   <property name="toolTip">
+    <string>Censure</string>
    </property>
   </action>
  </widget>
@@ -1603,6 +1620,22 @@ QProgressBar::chunk
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCensure</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>PlayerWindow</receiver>
+   <slot>VideoCensure(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>373</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>toggleGroup(bool)</slot>
@@ -1641,5 +1674,6 @@ QProgressBar::chunk
   <slot>ojectTracking(bool)</slot>
   <slot>VideoRuler(bool)</slot>
   <slot>MirrorHorizontalFilter(bool)</slot>
+  <slot>VideoCensure(bool)</slot>
  </slots>
 </ui>
