@@ -424,7 +424,6 @@ class VideoWidget(QVideoWidget):
 
             self.painter.setTransform(transform)
             self.painter.drawImage(rect, self._image, rect)
-            None
 
         # Draw On Video
         draw.drawOnVideo(self.drawPtPos, self.drawLines, self.drawPolygon,
