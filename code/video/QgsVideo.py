@@ -160,7 +160,7 @@ class VideoWidgetSurface(QAbstractVideoSurface):
         self.targetRect = QRect(QPoint(0, 0), size)
         self.targetRect.moveCenter(self.widget.rect().center())
 
-    def paint(self, painter):
+    def paint(self):
         ''' Paint Frame'''
         if (self.currentFrame.map(QAbstractVideoBuffer.ReadOnly)):
             #oldTransform = painter.transform()
@@ -341,6 +341,9 @@ class VideoWidget(QVideoWidget):
         ''' Return current frame QImage '''
         return self.surface.image
 
+    def GetCurrentFrameImage(self):
+        return self._image
+
     def SetInvertColor(self, value):
         ''' Set Invert color filter '''
         self._filterSatate.invertColorFilter = value
@@ -402,7 +405,7 @@ class VideoWidget(QVideoWidget):
                     self.painter.fillRect(rect, brush)
 
             try:
-                self._image = self.surface.paint(self.painter)
+                self._image = self.surface.paint()
             except Exception:
                 None
         else:
@@ -414,6 +417,8 @@ class VideoWidget(QVideoWidget):
             None
 
         if self._image is not None:
+            self.painter.scale(1, -1)
+            self.painter.translate(0, -self.height())
             transform = QTransform()
             scale = min(self.width()/self._image.width(), self.height()/self._image.height())
             transform.translate((self.width() - self._image.width()*scale)/2, (self.height() - self._image.height()*scale)/2)
@@ -421,7 +426,6 @@ class VideoWidget(QVideoWidget):
 
             inverse_transform, invertible = transform.inverted()
             rect = inverse_transform.mapRect(event.rect()).adjusted(-1, -1, 1, 1).intersected(self._image.rect())
-
             self.painter.setTransform(transform)
             self.painter.drawImage(rect, self._image, rect)
 

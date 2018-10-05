@@ -1114,7 +1114,7 @@ class QgsFmvPlayer(QMainWindow, Ui_PlayerWindow):
 
     def ExtractCurrentFrame(self):
         """ Extract Current Frame Thread """
-        image = self.videoWidget.GetCurrentFrame()
+        image = self.videoWidget.GetCurrentFrameImage()
         output, _ = askForFiles(self, QCoreApplication.translate(
             "QgsFmvPlayer", "Save Current Frame"),
             isSave=True,
