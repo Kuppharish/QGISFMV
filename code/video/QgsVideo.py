@@ -7,7 +7,8 @@ from PyQt5.QtGui import (QImage,
                          QRegion,
                          QColor,
                          QBrush,
-                         QCursor)
+                         QCursor,
+                         QTransform)
 
 from PyQt5.QtMultimedia import (QAbstractVideoBuffer,
                                 QVideoFrame,
@@ -162,11 +163,13 @@ class VideoWidgetSurface(QAbstractVideoSurface):
     def paint(self, painter):
         ''' Paint Frame'''
         if (self.currentFrame.map(QAbstractVideoBuffer.ReadOnly)):
-            oldTransform = painter.transform()
+            #oldTransform = painter.transform()
+            None
 
         if (self.surfaceFormat().scanLineDirection() == QVideoSurfaceFormat.BottomToTop):
-            painter.scale(1, -1)
-            painter.translate(0, -self.widget.height())
+            None
+            #painter.scale(1, -1)
+            #painter.translate(0, -self.widget.height())
 
         self.image = QImage(self.currentFrame.bits(),
                             self.currentFrame.width(),
@@ -193,26 +196,26 @@ class VideoWidgetSurface(QAbstractVideoSurface):
         if self.widget._filterSatate.invertColorFilter:
             self.image.invertPixels()
 
-        painter.drawImage(self.targetRect, self.image, self.sourceRect)
-
-        if self._interaction.objectTracking and self.widget._isinit:
-            frame = convertQImageToMat(self.image)
-            # Update tracker
-            ok, bbox = self.widget.tracker.update(frame)
-            # Draw bounding box
-            if ok:
-                #                 qgsu.showUserAndLogMessage(
-                #                     "bbox : ", str(bbox), level=QGis.Warning)
-                painter.setPen(Qt.blue)
-                painter.drawRect(QRect(int(bbox[0]), int(
-                    bbox[1]), int(bbox[2]), int(bbox[3])))
-            else:
-                qgsu.showUserAndLogMessage(
-                    "Tracking failure detected ", "", level=QGis.Warning)
-
-        painter.setTransform(oldTransform)
+#         painter.drawImage(self.targetRect, self.image, self.sourceRect)
+# 
+#         if self._interaction.objectTracking and self.widget._isinit:
+#             frame = convertQImageToMat(self.image)
+#             # Update tracker
+#             ok, bbox = self.widget.tracker.update(frame)
+#             # Draw bounding box
+#             if ok:
+#                 #                 qgsu.showUserAndLogMessage(
+#                 #                     "bbox : ", str(bbox), level=QGis.Warning)
+#                 painter.setPen(Qt.blue)
+#                 painter.drawRect(QRect(int(bbox[0]), int(
+#                     bbox[1]), int(bbox[2]), int(bbox[3])))
+#             else:
+#                 qgsu.showUserAndLogMessage(
+#                     "Tracking failure detected ", "", level=QGis.Warning)
+# 
+#         painter.setTransform(oldTransform)
         self.currentFrame.unmap()
-        return self.painter
+        return self.image
 
 
 class VideoWidget(QVideoWidget):
@@ -221,6 +224,7 @@ class VideoWidget(QVideoWidget):
         ''' Constructor '''
         super(VideoWidget, self).__init__(parent)
         self.surface = VideoWidgetSurface(self)
+        self._image = None
         self.Tracking_RubberBand = QRubberBand(QRubberBand.Rectangle, self)
 
         pal = QPalette()
@@ -398,7 +402,7 @@ class VideoWidget(QVideoWidget):
                     self.painter.fillRect(rect, brush)
 
             try:
-                self.painter = self.surface.paint(self.painter)
+                self._image = self.surface.paint(self.painter)
             except Exception:
                 None
         else:
@@ -407,6 +411,19 @@ class VideoWidget(QVideoWidget):
             SetImageSize(self.surface.currentFrame.width(),
                          self.surface.currentFrame.height())
         except Exception:
+            None
+
+        if self._image is not None:
+            transform = QTransform()
+            scale = min(self.width()/self._image.width(), self.height()/self._image.height())
+            transform.translate((self.width() - self._image.width()*scale)/2, (self.height() - self._image.height()*scale)/2)
+            transform.scale(scale, scale)
+
+            inverse_transform, invertible = transform.inverted()
+            rect = inverse_transform.mapRect(event.rect()).adjusted(-1, -1, 1, 1).intersected(self._image.rect())
+
+            self.painter.setTransform(transform)
+            self.painter.drawImage(rect, self._image, rect)
             None
 
         # Draw On Video
