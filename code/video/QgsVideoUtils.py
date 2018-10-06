@@ -16,7 +16,7 @@ class VideoUtils(object):
 
     @staticmethod
     def GetNormalizedWidth(surface):
-        return surface.widget.height(
+        return surface.height(
         ) * (GetImageWidth() / GetImageHeight())
 
     @staticmethod
@@ -32,33 +32,32 @@ class VideoUtils(object):
     @staticmethod
     def GetXRatio(surface):
         ''' ratio between event.x() and real image width on screen. '''
-        return GetImageWidth() / (surface.widget.width() - (2 * VideoUtils.GetXBlackZone(surface)))
+        return GetImageWidth() / (surface.width() - (2 * VideoUtils.GetXBlackZone(surface)))
 
     @staticmethod
     def GetYRatio(surface):
         ''' ratio between event.y() and real image height on screen. '''
-        return GetImageHeight() / (surface.widget.height() - (2 * VideoUtils.GetYBlackZone(surface)))
+        return GetImageHeight() / (surface.height() - (2 * VideoUtils.GetYBlackZone(surface)))
 
     @staticmethod
     def GetXBlackZone(surface):
         ''' Return is X in black screen on video '''
         x = 0.0
-        if (surface.widget.width() / surface.widget.height()) > (GetImageWidth() / GetImageHeight()):
-            x = (surface.widget.width() -
+        if (surface.width() / surface.height()) > (GetImageWidth() / GetImageHeight()):
+            x = (surface.width() -
                  (VideoUtils.GetNormalizedWidth(surface))) / 2.0
         return x
 
     @staticmethod
     def GetNormalizedHeight(surface):
-        return surface.widget.width(
-        ) / (GetImageWidth() / GetImageHeight())
+        return surface.width()
 
     @staticmethod
     def GetYBlackZone(surface):
         ''' Return is Y in black screen on video '''
         y = 0.0
-        if (surface.widget.width() / surface.widget.height()) < (GetImageWidth() / GetImageHeight()):
-            y = (surface.widget.height() -
+        if (surface.width() / surface.height()) < (GetImageWidth() / GetImageHeight()):
+            y = (surface.height() -
                  (VideoUtils.GetNormalizedHeight(surface))) / 2.0
         return y
 

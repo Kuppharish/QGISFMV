@@ -166,8 +166,8 @@ class VideoWidgetSurface(QAbstractVideoSurface):
             #oldTransform = painter.transform()
             None
 
-        if (self.surfaceFormat().scanLineDirection() == QVideoSurfaceFormat.BottomToTop):
-            None
+#         if (self.surfaceFormat().scanLineDirection() == QVideoSurfaceFormat.BottomToTop):
+#             None
             #painter.scale(1, -1)
             #painter.translate(0, -self.widget.height())
 
@@ -298,7 +298,7 @@ class VideoWidget(QVideoWidget):
         if GetImageHeight() == 0:
             return
 
-        if(not vut.IsPointOnScreen(event.x(), event.y(), self.surface)):
+        if(not vut.IsPointOnScreen(event.x(), event.y(), self)):
             return
 
         if self.gt is not None and self._interaction.lineDrawer:
@@ -394,7 +394,6 @@ class VideoWidget(QVideoWidget):
 
         self.painter = QPainter(self)
         self.painter.setRenderHint(QPainter.HighQualityAntialiasing)
-
         if (self.surface.isActive()):
             videoRect = self.surface.videoRect()
             if not videoRect.contains(event.rect()):
@@ -410,13 +409,12 @@ class VideoWidget(QVideoWidget):
                 None
         else:
             self.painter.fillRect(event.rect(), self.palette().window())
-        try:
-            SetImageSize(self.surface.currentFrame.width(),
-                         self.surface.currentFrame.height())
-        except Exception:
-            None
 
         if self._image is not None:
+
+            SetImageSize(self._image.width(),
+                         self._image.height())
+ 
             self.painter.scale(1, -1)
             self.painter.translate(0, -self.height())
             transform = QTransform()
@@ -431,7 +429,7 @@ class VideoWidget(QVideoWidget):
 
         # Draw On Video
         draw.drawOnVideo(self.drawPtPos, self.drawLines, self.drawPolygon,
-                         self.drawRuler, self.painter, self.surface, self.gt)
+                         self.drawRuler, self.painter, self, self.gt)
 
         # Magnifier Glass
         if self.zoomed and self._interaction.magnifier:
@@ -461,7 +459,7 @@ class VideoWidget(QVideoWidget):
             return
 
         # check if the point  is on picture (not in black borders)
-        if(not vut.IsPointOnScreen(event.x(), event.y(), self.surface)):
+        if(not vut.IsPointOnScreen(event.x(), event.y(), self)):
             return
 
         if self._interaction.pointDrawer or self._interaction.polygonDrawer or self._interaction.lineDrawer or self._interaction.ruler:
@@ -471,7 +469,7 @@ class VideoWidget(QVideoWidget):
         if self.gt is not None:
 
             Longitude, Latitude, Altitude = vut.GetPointCommonCoords(
-                event, self.surface)
+                event, self)
 
             txt = "<span style='font-size:10pt; font-weight:bold;'>Lon :</span>"
             txt += "<span style='font-size:9pt; font-weight:normal;'>" + \
@@ -549,14 +547,15 @@ class VideoWidget(QVideoWidget):
             self.tapTimer.stop()
             self.tapTimer.start(100, self)
 
-            if(not vut.IsPointOnScreen(event.x(), event.y(), self.surface)):
+            if(not vut.IsPointOnScreen(event.x(), event.y(), self)):
                 self.UpdateSurface()
                 return
 
             # point drawer
             if self.gt is not None and self._interaction.pointDrawer:
+                
                 Longitude, Latitude, Altitude = vut.GetPointCommonCoords(
-                    event, self.surface)
+                    event, self)
 
                 AddDrawPointOnMap(self.pointIndex, Longitude,
                                   Latitude, Altitude)
